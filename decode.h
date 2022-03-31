@@ -9,11 +9,11 @@
 using namespace std;
 
 #define OPCODE(instruction) (decimalToHexa(binaryToDecimal(instruction.substr(0, 6))))
-#define RS(instruction) (to_string(binaryToDecimal(instruction.substr(6, 5))))
-#define RT(instruction) (to_string(binaryToDecimal(instruction.substr(11, 5))))
-#define RD(instruction) (to_string(binaryToDecimal(instruction.substr(16, 5))))
+#define RS(instruction) (binaryToDecimal(instruction.substr(6, 5)))
+#define RT(instruction) (binaryToDecimal(instruction.substr(11, 5)))
+#define RD(instruction) (binaryToDecimal(instruction.substr(16, 5)))
 #define ADDRESS(instruction) (decimalToHexa(binaryToDecimal(instruction.substr(6, 26))))
-#define IMMEDIATE(instruction) (decimalToHexa(binaryToDecimal(instruction.substr(16, 16))))
+#define IMMEDIATE(instruction) (instruction.substr(16, 16))
 #define FUNCT(instruction) (decimalToHexa(binaryToDecimal(instruction.substr(26, 6))))
 #define SHAMT(instruction) (to_string(binaryToDecimal(instruction.substr(21, 5))))
 
@@ -96,9 +96,9 @@ void decodeRtypeInstruction(string instruction){
 
     cout << "Instruction Type: R" << endl;
     cout << "Operation: " + operationTable[FUNCT(instruction)]<< endl;
-    cout << "Rs: $" + RS(instruction) << endl;
-    cout << "Rt: $" + RT(instruction) << endl;
-    cout << "Rd: $" + RD(instruction) << endl;
+    cout << "Rs: $" + to_string(RS(instruction)) << endl;
+    cout << "Rt: $" + to_string(RT(instruction)) << endl;
+    cout << "Rd: $" + to_string(RD(instruction)) << endl;
     cout << "Shamt: " + SHAMT(instruction) << endl;
     cout << "Funct: 0x" + FUNCT(instruction)<< endl;
 }
@@ -125,8 +125,8 @@ void decodeItypeInstruction(string instruction){
 
     cout << "Instruction Type: I" << endl;
     cout << "Operation: " + operationTable[OPCODE(instruction)]<< endl;
-    cout << "Rs: $" + RS(instruction) << endl;
-    cout << "Rt: $" + RT(instruction) << endl;
+    cout << "Rs: $" + to_string(RS(instruction)) << endl;
+    cout << "Rt: $" + to_string(RT(instruction)) << endl;
     cout << "Immediate: 0x" + IMMEDIATE(instruction)<< endl;
 }
 
