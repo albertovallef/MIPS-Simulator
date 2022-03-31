@@ -1,12 +1,6 @@
 #ifndef DECODE_H
 #define DECODE_H
 
-#include <string>
-#include <math.h>
-#include <iomanip>
-#include <map>
-#include<tuple>
-
 using namespace std;
 
 #define OPCODE(instruction) (decimalToHexa(binaryToDecimal(instruction.substr(0, 6))))

@@ -1,10 +1,6 @@
 #ifndef FETCH_H
 #define FETCH_H
 
-#include <iostream>
-#include <fstream>
-#include <string>
-
 // Global variables
 int pc = 0;
 int next_pc =  pc + 4;

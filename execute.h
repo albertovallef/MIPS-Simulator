@@ -1,9 +1,6 @@
 #ifndef EXECUTE_H
 #define EXECUTE_H
 
-#include <iostream>
-#include <fstream>
-#include <string>
 #include "mem.h"
 
 int alu_zero = 0;
