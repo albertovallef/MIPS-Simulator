@@ -92,19 +92,41 @@ tuple<string, int, int, int, bool, bool> decodeRtypeInstruction(string instructi
         {"22", "sub",},
         {"23", "subu",}
         };
+    // TODO: Need to clean this up
     if(operationTable[FUNCT(instruction)] == "sub"){
         int alu_op = 5; // substract
         int readData1 = registerfile[RS(instruction)];
         int readData2 = registerfile[RT(instruction)];
         string destReg = RD(instruction);
-        return make_tuple(destReg, readData1, readData2, alu_op, true, false); // ADD for alu_op
+        return make_tuple(destReg, readData1, readData2, alu_op, true, false); 
     }
     else if (operationTable[FUNCT(instruction)] == "slt"){
-        int alu_op = 6; // substract
+        int alu_op = 6; // slt
         int readData1 = registerfile[RS(instruction)];
         int readData2 = registerfile[RT(instruction)];
         string destReg = RD(instruction);
         return make_tuple(destReg, readData1, readData2, alu_op, true, false); // ADD for alu_op
+    }
+    else if (operationTable[FUNCT(instruction)] == "and"){
+        int alu_op = 0; // AND code
+        int readData1 = registerfile[RS(instruction)];
+        int readData2 = registerfile[RT(instruction)];
+        string destReg = RD(instruction);
+        return make_tuple(destReg, readData1, readData2, alu_op, true, false);
+    }
+    else if (operationTable[FUNCT(instruction)] == "or"){
+        int alu_op = 1; // OR code
+        int readData1 = registerfile[RS(instruction)];
+        int readData2 = registerfile[RT(instruction)];
+        string destReg = RD(instruction);
+        return make_tuple(destReg, readData1, readData2, alu_op, true, false);
+    }
+    else if (operationTable[FUNCT(instruction)] == "nor"){
+        int alu_op = 12; // NOR code
+        int readData1 = registerfile[RS(instruction)];
+        int readData2 = registerfile[RT(instruction)];
+        string destReg = RD(instruction);
+        return make_tuple(destReg, readData1, readData2, alu_op, true, false);
     }
     string destReg = RT(instruction);
     return make_tuple(destReg, 1, 1, 1, false, false);
