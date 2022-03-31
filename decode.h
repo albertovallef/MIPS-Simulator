@@ -1,5 +1,5 @@
-#ifndef DECODER_H
-#define DECODER_H
+#ifndef DECODE_H
+#define DECODE_H
 
 #include <string>
 #include <math.h>
@@ -24,7 +24,21 @@ int binaryToDecimal(string binary);
 void decodeRtypeInstruction(string instruction);
 void decodeItypeInstruction(string instruction);
 void decodeJtypeInstruction(string instruction);
+string signExtend(string offset);
 int jump_next = 0;
+map<string, int> registerfile = {
+        {"$0", 0,},
+        {"$1", 0,},
+        {"$2", 0,}, {"$3", 0,},
+        {"$4", 0,},{"$5", 0,},{"$6", 0,},{"$7", 0,},
+        {"$8", 0,},{"$9", 0,},{"$10", 0,},{"$11", 0,},{"$12", 0,},{"$13", 0,},{"$14", 0,},{"$15", 0,},
+        {"$16", 0,},{"$17", 0,},{"$18", 0,},{"$19", 0,},{"$20", 0,},{"$21", 0,},{"$22", 0,},{"$23", 0,},
+        {"$24", 0,},{"$25", 0,},{"$26", 0,},{"$27", 0,}, 
+        {"$28", 0,},
+        {"$29", 0,},
+        {"$30", 0,},
+        {"$31", 0,},
+        };
 
 void decode(string instruction)
 {
@@ -41,15 +55,7 @@ void decode(string instruction)
 }
 
 int binaryToDecimal(string binary) {
-    int decimalNumber = 0;
-    int exponent = binary.length() - 1;
-
-    for(int i = 0; i < binary.length(); i++){
-        if(binary[i] == '1') {
-            decimalNumber = decimalNumber + pow(2, exponent);
-        }
-        exponent--;
-    }
+	int decimalNumber = stoi(binary, 0, 2);
     return decimalNumber;
 }
 
@@ -133,6 +139,11 @@ void decodeJtypeInstruction(string instruction){
     cout << "Instruction Type: J" << endl;
     cout << "Operation: " + operationTable[OPCODE(instruction)]<< endl;
     cout << "Immediate: 0x" + ADDRESS(instruction) << endl;
+}
+
+string signExtend(string offset) {
+    cout << offset[0]<< endl;
+    return "";
 }
 
 #endif
