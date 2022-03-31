@@ -5,6 +5,7 @@
 #include <math.h>
 #include <iomanip>
 #include <map>
+#include<tuple>
 
 using namespace std;
 
@@ -21,37 +22,39 @@ template<typename T>
 string decimalToHexa(T value);
 string getInstructionType(string opcode);
 int binaryToDecimal(string binary);
-void decodeRtypeInstruction(string instruction);
-void decodeItypeInstruction(string instruction);
-void decodeJtypeInstruction(string instruction);
 int sign_extend(int binary, int bits);
-string signExtend(string offset);
 int jump_next = 0;
+void decodeRtypeInstruction(string instruction);
+tuple<int, int, int> decodeItypeInstruction(string instruction);
+void decodeJtypeInstruction(string instruction);
 map<string, int> registerfile = {
-        {"$0", 0,},
-        {"$1", 0,},
-        {"$2", 0,}, {"$3", 0,},
-        {"$4", 0,},{"$5", 0,},{"$6", 0,},{"$7", 0,},
-        {"$8", 0,},{"$9", 0,},{"$10", 0,},{"$11", 0,},{"$12", 0,},{"$13", 0,},{"$14", 0,},{"$15", 0,},
-        {"$16", 0,},{"$17", 0,},{"$18", 0,},{"$19", 0,},{"$20", 0,},{"$21", 0,},{"$22", 0,},{"$23", 0,},
-        {"$24", 0,},{"$25", 0,},{"$26", 0,},{"$27", 0,}, 
-        {"$28", 0,},
-        {"$29", 0,},
-        {"$30", 0,},
-        {"$31", 0,},
+        {"$0", 0,}, // $zero
+        {"$1", 0,}, // $at
+        {"$2", 0,}, {"$3", 0,}, // $v0-$v1
+        {"$4", 0,},{"$5", 0,},{"$6", 0,},{"$7", 0,}, // $a1-$a3
+        {"$8", 0,},{"$9", 0,},{"$10", 0,},{"$11", 0,},{"$12", 0,},{"$13", 0,},{"$14", 0,},{"$15", 0,}, // $t0-$t7
+        {"$16", 0,},{"$17", 0,},{"$18", 0,},{"$19", 0,},{"$20", 0,},{"$21", 0,},{"$22", 0,},{"$23", 0,}, // $s0-$s7
+        {"$24", 0,},{"$25", 0,}, // $t8-$t9
+        {"$26", 0,},{"$27", 0,}, // $k0-$k1
+        {"$28", 0,}, // $gp
+        {"$29", 0,}, // $sp
+        {"$30", 0,}, // $fp
+        {"$31", 0,}, // $ra
         };
 
-void decode(string instruction)
+tuple<int, int, int> decode(string instruction)
 {
     string instructionType = getInstructionType(OPCODE(instruction));
     if(instructionType == "R"){
         decodeRtypeInstruction(instruction);
+        return make_tuple(1, 2, 3);
     }
     else if(instructionType == "I"){
-        decodeItypeInstruction(instruction);
+        return decodeItypeInstruction(instruction);
     }
     else {
         decodeJtypeInstruction(instruction);
+        return make_tuple(1, 2, 3);
     }
 }
 
@@ -104,7 +107,7 @@ void decodeRtypeInstruction(string instruction){
     cout << "Funct: 0x" + FUNCT(instruction)<< endl;
 }
 
-void decodeItypeInstruction(string instruction){
+tuple<int, int, int> decodeItypeInstruction(string instruction){
     map<string, string> operationTable = {
         {"8", "addi",},
         {"9", "addiu",},
@@ -125,10 +128,18 @@ void decodeItypeInstruction(string instruction){
         };
 
     cout << "Instruction Type: I" << endl;
-    cout << "Operation: " + operationTable[OPCODE(instruction)]<< endl;
-    cout << "Rs: $" + to_string(RS(instruction)) << endl;
-    cout << "Rt: $" + to_string(RT(instruction)) << endl;
-    cout << std::hex << "Immediate: 0x" + to_string(sign_extend(IMMEDIATE(instruction), 32))<< endl;
+    // cout << "Operation: " + operationTable[OPCODE(instruction)]<< endl;
+    // cout << "Rs: $" + to_string(RS(instruction)) << endl;
+    // cout << "Rt: $" + to_string(RT(instruction)) << endl;
+    // cout << std::hex << "Immediate: 0x" + to_string(sign_extend(IMMEDIATE(instruction), 32))<< endl;
+    if(operationTable[OPCODE(instruction)] == "lw"){
+        int alu_op = 2;
+        int readData1 = registerfile[to_string(RS(instruction))];
+        int readData2 = sign_extend(IMMEDIATE(instruction), 32);
+        return make_tuple(readData1, readData2, alu_op); // ADD for alu_op
+    }
+    return make_tuple(1, 2, 3);
+
 }
 
 void decodeJtypeInstruction(string instruction){
@@ -140,14 +151,6 @@ void decodeJtypeInstruction(string instruction){
     cout << "Instruction Type: J" << endl;
     cout << "Operation: " + operationTable[OPCODE(instruction)]<< endl;
     cout << "Immediate: 0x" + ADDRESS(instruction) << endl;
-}
-
-void readData1() {
-
-}
-
-void readData2(){
-    
 }
 
 int sign_extend(int binary, int bits) {
