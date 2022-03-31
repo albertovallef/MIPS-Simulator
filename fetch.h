@@ -1,9 +1,13 @@
 #ifndef FETCH_H
 #define FETCH_H
 
+
 // Global variables
 int pc = 0;
 int next_pc =  pc + 4;
+
+#include "execute.h"
+#include "writeback.h"
 
 std::string fetch(std::string textFile) { 
     std::string instruction;
@@ -13,6 +17,10 @@ std::string fetch(std::string textFile) {
     if (InstructionFile.is_open())
     {
         int i = 0;
+        if(alu_zero) {
+            pc = pc + jump_next;
+            writeback("none", 0, false); 
+        }
         // Iterate over the lines in the file
         while ( InstructionFile.good() )
         {

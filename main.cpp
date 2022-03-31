@@ -21,7 +21,6 @@ int main()
     // cin >> textFile;
 
     while(true){
-
     // FETCH
     string instruction = fetch(textFile);
     // If no instruction, terminate program
@@ -33,16 +32,27 @@ int main()
     cout << "Fetched instruction: " + instruction << endl;
 
     // DECODE
-    cout << "DECODE instruction: " << endl;
     int readData1, readData2, alu_op;
-    tie(readData1, readData2, alu_op) = decode(instruction);
+    string destReg;
+    bool wbMux;
+    tie(destReg, readData1, readData2, alu_op, wbMux) = decode(instruction);
+    // cout << "readData1: " + to_string(readData1) << endl;
+    // cout << "readData1: " + to_string(readData2) << endl;
+    // cout << "alu_op: " + to_string(alu_op) << endl;
+
+    // CONTROL UNIT
+    // int alu_op = controlunit(?);
 
     // EXECUTE
     int alu_result = execute(readData1, readData2, alu_op);
-    cout << alu_result << endl;
 
+    // No WRITEBACK
+    if(destReg == "none") {
+        continue;
+    }
     // WRITEBACK
-    writeback(alu_op);
+    // if(OPCODE(instruction) == )
+    writeback(destReg, alu_result, wbMux);
 
     }
 }

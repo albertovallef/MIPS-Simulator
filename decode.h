@@ -4,9 +4,9 @@
 using namespace std;
 
 #define OPCODE(instruction) (decimalToHexa(binaryToDecimal(instruction.substr(0, 6))))
-#define RS(instruction) (binaryToDecimal(instruction.substr(6, 5)))
-#define RT(instruction) (binaryToDecimal(instruction.substr(11, 5)))
-#define RD(instruction) (binaryToDecimal(instruction.substr(16, 5)))
+#define RS(instruction) (getRegisterName(binaryToDecimal(instruction.substr(6, 5))))
+#define RT(instruction) (getRegisterName(binaryToDecimal(instruction.substr(11, 5))))
+#define RD(instruction) (getRegisterName(binaryToDecimal(instruction.substr(16, 5))))
 #define ADDRESS(instruction) (decimalToHexa(binaryToDecimal(instruction.substr(6, 26))))
 #define IMMEDIATE(instruction) (binaryToDecimal(instruction.substr(16, 16)))
 #define FUNCT(instruction) (decimalToHexa(binaryToDecimal(instruction.substr(26, 6))))
@@ -15,40 +15,41 @@ using namespace std;
 template<typename T>
 string decimalToHexa(T value);
 string getInstructionType(string opcode);
+string getRegisterName(int registerNumber);
 int binaryToDecimal(string binary);
 int sign_extend(int binary, int bits);
 int jump_next = 0;
-void decodeRtypeInstruction(string instruction);
-tuple<int, int, int> decodeItypeInstruction(string instruction);
+tuple<string, int, int, int, bool> decodeRtypeInstruction(string instruction);
+tuple<string, int, int, int, bool> decodeItypeInstruction(string instruction);
 void decodeJtypeInstruction(string instruction);
 map<string, int> registerfile = {
-        {"$0", 0,}, // $zero
-        {"$1", 0,}, // $at
-        {"$2", 0,}, {"$3", 0,}, // $v0-$v1
-        {"$4", 0,},{"$5", 0,},{"$6", 0,},{"$7", 0,}, // $a1-$a3
-        {"$8", 0,},{"$9", 0,},{"$10", 0,},{"$11", 0,},{"$12", 0,},{"$13", 0,},{"$14", 0,},{"$15", 0,}, // $t0-$t7
-        {"$16", 0,},{"$17", 0,},{"$18", 0,},{"$19", 0,},{"$20", 0,},{"$21", 0,},{"$22", 0,},{"$23", 0,}, // $s0-$s7
-        {"$24", 0,},{"$25", 0,}, // $t8-$t9
-        {"$26", 0,},{"$27", 0,}, // $k0-$k1
-        {"$28", 0,}, // $gp
-        {"$29", 0,}, // $sp
-        {"$30", 0,}, // $fp
-        {"$31", 0,}, // $ra
+        {"$zero", 0,}, // $zero
+        {"$at", 0,}, // $at
+        {"$v0", 0,}, {"$v1", 0,}, // $v0-$v1
+        {"$a1", 0,},{"$a2", 0,},{"$a3", 0,},{"$a4", 0,}, // $a1-$a3
+        {"$t0", 0,},{"$t1", 0x20,},{"$t2", 0x5,},{"$t3", 0,},{"$t4", 0,},{"$t5", 0,},{"$t6", 0,},{"$t7", 0,}, // $t0-$t7
+        {"$s0", 0x70,},{"$s1", 0,},{"$s2", 0,},{"$s3", 0,},{"$s4", 0,},{"$s5", 0,},{"$s6", 0,},{"$s7", 0,}, // $s0-$s7
+        {"$t8", 0,},{"$t9", 0,}, // $t8-$t9
+        {"$k0", 0,},{"$k1", 0,}, // $k0-$k1
+        {"$gp", 0,}, // $gp
+        {"$sp", 0,}, // $sp
+        {"$fp", 0,}, // $fp
+        {"$ra", 0,}, // $ra
         };
 
-tuple<int, int, int> decode(string instruction)
+tuple<string, int, int, int, bool> decode(string instruction)
 {
     string instructionType = getInstructionType(OPCODE(instruction));
     if(instructionType == "R"){
-        decodeRtypeInstruction(instruction);
-        return make_tuple(1, 2, 3);
+        return decodeRtypeInstruction(instruction);
     }
     else if(instructionType == "I"){
         return decodeItypeInstruction(instruction);
     }
     else {
         decodeJtypeInstruction(instruction);
-        return make_tuple(1, 2, 3);
+        string ran = "ads";
+        return make_tuple(ran, 1, 2, 3, false);
     }
 }
 
@@ -76,7 +77,7 @@ string getInstructionType(string opcode){
     }
 }
 
-void decodeRtypeInstruction(string instruction){
+tuple<string, int, int, int, bool> decodeRtypeInstruction(string instruction){
     map<string, string> operationTable = {
         {"20", "add",}, 
         {"21", "addu",},
@@ -91,17 +92,25 @@ void decodeRtypeInstruction(string instruction){
         {"22", "sub",},
         {"23", "subu",}
         };
-
-    cout << "Instruction Type: R" << endl;
-    cout << "Operation: " + operationTable[FUNCT(instruction)]<< endl;
-    cout << "Rs: $" + to_string(RS(instruction)) << endl;
-    cout << "Rt: $" + to_string(RT(instruction)) << endl;
-    cout << "Rd: $" + to_string(RD(instruction)) << endl;
-    cout << "Shamt: " + SHAMT(instruction) << endl;
-    cout << "Funct: 0x" + FUNCT(instruction)<< endl;
+    if(operationTable[FUNCT(instruction)] == "sub"){
+        int alu_op = 5; // substract
+        int readData1 = registerfile[RS(instruction)];
+        int readData2 = registerfile[RT(instruction)];
+        string destReg = RD(instruction);
+        return make_tuple(destReg, readData1, readData2, alu_op, true); // ADD for alu_op
+    }
+    else if (operationTable[FUNCT(instruction)] == "slt"){
+        int alu_op = 6; // substract
+        int readData1 = registerfile[RS(instruction)];
+        int readData2 = registerfile[RT(instruction)];
+        string destReg = RD(instruction);
+        return make_tuple(destReg, readData1, readData2, alu_op, true); // ADD for alu_op
+    }
+    string destReg = RT(instruction);
+    return make_tuple(destReg, 1, 1, 1, true);
 }
 
-tuple<int, int, int> decodeItypeInstruction(string instruction){
+tuple<string, int, int, int, bool> decodeItypeInstruction(string instruction){
     map<string, string> operationTable = {
         {"8", "addi",},
         {"9", "addiu",},
@@ -121,18 +130,24 @@ tuple<int, int, int> decodeItypeInstruction(string instruction){
         {"2b", "sw",}
         };
 
-    cout << "Instruction Type: I" << endl;
-    // cout << "Operation: " + operationTable[OPCODE(instruction)]<< endl;
-    // cout << "Rs: $" + to_string(RS(instruction)) << endl;
-    // cout << "Rt: $" + to_string(RT(instruction)) << endl;
-    // cout << std::hex << "Immediate: 0x" + to_string(sign_extend(IMMEDIATE(instruction), 32))<< endl;
     if(operationTable[OPCODE(instruction)] == "lw"){
-        int alu_op = 2;
-        int readData1 = registerfile[to_string(RS(instruction))];
+        int alu_op = 2; // add
+        int readData1 = registerfile[RS(instruction)];
         int readData2 = sign_extend(IMMEDIATE(instruction), 32);
-        return make_tuple(readData1, readData2, alu_op); // ADD for alu_op
+        string destReg = RT(instruction);
+        return make_tuple(destReg, readData1, readData2, alu_op, false); // ADD for alu_op
     }
-    return make_tuple(1, 2, 3);
+    else if (operationTable[OPCODE(instruction)] == "beq") {
+        int alu_op = 5; // sub
+        int readData1 = registerfile[RS(instruction)];
+        int readData2 = registerfile[RT(instruction)];
+        jump_next = sign_extend(IMMEDIATE(instruction), 32);
+        jump_next = jump_next << 2;
+        string destReg = "none";
+        return make_tuple(destReg, readData1, readData2, alu_op, false); // ADD for alu_op
+    }
+    string destReg = RT(instruction);
+    return make_tuple(destReg, 1, 1, 1, false);
 
 }
 
@@ -151,6 +166,44 @@ int sign_extend(int binary, int bits) {
     int m = 1;
     m <<= bits - 1;
     return (binary ^ m) - m;
+}
+
+string getRegisterName(int regNumber){
+    switch(regNumber) {
+    case 0: return "$zero";
+    case 1: return "$at";
+    case 2: return "$v0";
+    case 3: return "$v1";
+    case 4: return "$a0";
+    case 5: return "$a1";
+    case 6: return "$a2";
+    case 7: return "$a3";
+    case 8: return "$t0";
+    case 9: return "$t1";
+    case 10: return "$t2";
+    case 11: return "$t3";
+    case 12: return "$t4";
+    case 13: return "$t5";
+    case 14: return "$t6";
+    case 15: return "$t7";
+    case 16: return "$s0";
+    case 17: return "$s1";
+    case 18: return "$s2";
+    case 19: return "$s3";
+    case 20: return "$s4";
+    case 21: return "$s5";
+    case 22: return "$s6";
+    case 23: return "$s7";
+    case 24: return "$t8";
+    case 25: return "$t9";
+    case 26: return "$k0";
+    case 27: return "$k1";
+    case 28: return "$gp";
+    case 29: return "$sp";
+    case 30: return "$fp";
+    case 31: return "$ra";
+    default: return "$error";
+    }
 }
 
 #endif
