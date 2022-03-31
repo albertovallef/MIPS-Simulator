@@ -19,8 +19,8 @@ string getRegisterName(int registerNumber);
 int binaryToDecimal(string binary);
 int sign_extend(int binary, int bits);
 int jump_next = 0;
-tuple<string, int, int, int, bool> decodeRtypeInstruction(string instruction);
-tuple<string, int, int, int, bool> decodeItypeInstruction(string instruction);
+tuple<string, int, int, int, bool, bool> decodeRtypeInstruction(string instruction);
+tuple<string, int, int, int, bool, bool> decodeItypeInstruction(string instruction);
 void decodeJtypeInstruction(string instruction);
 map<string, int> registerfile = {
         {"$zero", 0,}, // $zero
@@ -37,7 +37,7 @@ map<string, int> registerfile = {
         {"$ra", 0,}, // $ra
         };
 
-tuple<string, int, int, int, bool> decode(string instruction)
+tuple<string, int, int, int, bool, bool> decode(string instruction)
 {
     string instructionType = getInstructionType(OPCODE(instruction));
     if(instructionType == "R"){
@@ -49,7 +49,7 @@ tuple<string, int, int, int, bool> decode(string instruction)
     else {
         decodeJtypeInstruction(instruction);
         string ran = "ads";
-        return make_tuple(ran, 1, 2, 3, false);
+        return make_tuple(ran, 1, 2, 3, false, false);
     }
 }
 
@@ -77,7 +77,7 @@ string getInstructionType(string opcode){
     }
 }
 
-tuple<string, int, int, int, bool> decodeRtypeInstruction(string instruction){
+tuple<string, int, int, int, bool, bool> decodeRtypeInstruction(string instruction){
     map<string, string> operationTable = {
         {"20", "add",}, 
         {"21", "addu",},
@@ -97,20 +97,20 @@ tuple<string, int, int, int, bool> decodeRtypeInstruction(string instruction){
         int readData1 = registerfile[RS(instruction)];
         int readData2 = registerfile[RT(instruction)];
         string destReg = RD(instruction);
-        return make_tuple(destReg, readData1, readData2, alu_op, true); // ADD for alu_op
+        return make_tuple(destReg, readData1, readData2, alu_op, true, false); // ADD for alu_op
     }
     else if (operationTable[FUNCT(instruction)] == "slt"){
         int alu_op = 6; // substract
         int readData1 = registerfile[RS(instruction)];
         int readData2 = registerfile[RT(instruction)];
         string destReg = RD(instruction);
-        return make_tuple(destReg, readData1, readData2, alu_op, true); // ADD for alu_op
+        return make_tuple(destReg, readData1, readData2, alu_op, true, false); // ADD for alu_op
     }
     string destReg = RT(instruction);
-    return make_tuple(destReg, 1, 1, 1, true);
+    return make_tuple(destReg, 1, 1, 1, false, false);
 }
 
-tuple<string, int, int, int, bool> decodeItypeInstruction(string instruction){
+tuple<string, int, int, int, bool, bool> decodeItypeInstruction(string instruction){
     map<string, string> operationTable = {
         {"8", "addi",},
         {"9", "addiu",},
@@ -135,7 +135,7 @@ tuple<string, int, int, int, bool> decodeItypeInstruction(string instruction){
         int readData1 = registerfile[RS(instruction)];
         int readData2 = sign_extend(IMMEDIATE(instruction), 32);
         string destReg = RT(instruction);
-        return make_tuple(destReg, readData1, readData2, alu_op, false); // ADD for alu_op
+        return make_tuple(destReg, readData1, readData2, alu_op, false, false); 
     }
     else if (operationTable[OPCODE(instruction)] == "beq") {
         int alu_op = 5; // sub
@@ -144,10 +144,17 @@ tuple<string, int, int, int, bool> decodeItypeInstruction(string instruction){
         jump_next = sign_extend(IMMEDIATE(instruction), 32);
         jump_next = jump_next << 2;
         string destReg = "none";
-        return make_tuple(destReg, readData1, readData2, alu_op, false); // ADD for alu_op
+        return make_tuple(destReg, readData1, readData2, alu_op, false, false); 
+    }
+    else if (operationTable[OPCODE(instruction)] == "sw") {
+        int alu_op = 2; // add
+        int readData1 = registerfile[RS(instruction)];
+        int readData2 = sign_extend(IMMEDIATE(instruction), 32);
+        string destReg = RT(instruction);
+        return make_tuple(destReg, readData1, readData2, alu_op, false, true); 
     }
     string destReg = RT(instruction);
-    return make_tuple(destReg, 1, 1, 1, false);
+    return make_tuple(destReg, 1, 1, 1, false, false);
 
 }
 

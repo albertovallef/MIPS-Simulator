@@ -18,9 +18,6 @@ int execute(int readData1, int readData2, int alu_op) {
         // 0010 do add
         return readData1 + readData2;
     case 5:
-        // 0110 do substract
-        // cout << "HERE!!!" << endl;
-        // cout << readData1 - readData2 << endl;
         if(readData1 - readData2 == 0) {
             alu_zero = true;
         }

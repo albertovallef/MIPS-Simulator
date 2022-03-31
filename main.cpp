@@ -25,20 +25,19 @@ int main()
     string instruction = fetch(textFile);
     // If no instruction, terminate program
     if(instruction == ""){
+        cout << endl;
         cout << "program terminated:" << endl;  
         cout << "total execution time is " + to_string(total_clock_cycles) + " cycles" << endl;
         return 0;
     }
-    cout << "Fetched instruction: " + instruction << endl;
+    // cout << "Fetched instruction: " + instruction << endl;
+    cout << endl;
 
     // DECODE
     int readData1, readData2, alu_op;
     string destReg;
-    bool wbMux;
-    tie(destReg, readData1, readData2, alu_op, wbMux) = decode(instruction);
-    // cout << "readData1: " + to_string(readData1) << endl;
-    // cout << "readData1: " + to_string(readData2) << endl;
-    // cout << "alu_op: " + to_string(alu_op) << endl;
+    bool memtoReg, memWrite;
+    tie(destReg, readData1, readData2, alu_op, memtoReg, memWrite) = decode(instruction);
 
     // CONTROL UNIT
     // int alu_op = controlunit(?);
@@ -50,9 +49,7 @@ int main()
     if(destReg == "none") {
         continue;
     }
-    // WRITEBACK
-    // if(OPCODE(instruction) == )
-    writeback(destReg, alu_result, wbMux);
+    writeback(destReg, alu_result, memtoReg, memWrite);
 
     }
 }
