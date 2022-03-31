@@ -7,18 +7,21 @@ using namespace std;
 
 int main()
 {
+    while(true){
     // Get the name of the text file with instructions
     string textFile = "sample_part1.txt";
     // cin >> textFile;
 
-    // Fetch the instruction from the text file
+    // FETCH
     string instruction = fetch(textFile);
-    cout << instruction << endl;
+    // If no instruction, terminate program
+    if(instruction == ""){
+        return 0;
+    }
+    cout << "Fetched instruction: " + instruction << endl;
 
-    // Decode instruction 
+    // DECODE
+    cout << "DECODE instruction: " << endl;
     decode(instruction);
-
-    // testing
-    // int num = 0xf;
-    // cout << std::hex << num << endl;
+    }
 }

@@ -13,7 +13,7 @@ using namespace std;
 #define RT(instruction) (binaryToDecimal(instruction.substr(11, 5)))
 #define RD(instruction) (binaryToDecimal(instruction.substr(16, 5)))
 #define ADDRESS(instruction) (decimalToHexa(binaryToDecimal(instruction.substr(6, 26))))
-#define IMMEDIATE(instruction) (instruction.substr(16, 16))
+#define IMMEDIATE(instruction) (binaryToDecimal(instruction.substr(16, 16)))
 #define FUNCT(instruction) (decimalToHexa(binaryToDecimal(instruction.substr(26, 6))))
 #define SHAMT(instruction) (to_string(binaryToDecimal(instruction.substr(21, 5))))
 
@@ -24,6 +24,7 @@ int binaryToDecimal(string binary);
 void decodeRtypeInstruction(string instruction);
 void decodeItypeInstruction(string instruction);
 void decodeJtypeInstruction(string instruction);
+int sign_extend(int binary, int bits);
 string signExtend(string offset);
 int jump_next = 0;
 map<string, int> registerfile = {
@@ -127,7 +128,7 @@ void decodeItypeInstruction(string instruction){
     cout << "Operation: " + operationTable[OPCODE(instruction)]<< endl;
     cout << "Rs: $" + to_string(RS(instruction)) << endl;
     cout << "Rt: $" + to_string(RT(instruction)) << endl;
-    cout << "Immediate: 0x" + IMMEDIATE(instruction)<< endl;
+    cout << std::hex << "Immediate: 0x" + to_string(sign_extend(IMMEDIATE(instruction), 32))<< endl;
 }
 
 void decodeJtypeInstruction(string instruction){
@@ -141,9 +142,18 @@ void decodeJtypeInstruction(string instruction){
     cout << "Immediate: 0x" + ADDRESS(instruction) << endl;
 }
 
-string signExtend(string offset) {
-    cout << offset[0]<< endl;
-    return "";
+void readData1() {
+
+}
+
+void readData2(){
+    
+}
+
+int sign_extend(int binary, int bits) {
+    int m = 1;
+    m <<= bits - 1;
+    return (binary ^ m) - m;
 }
 
 #endif
