@@ -6,7 +6,8 @@
 #include <iomanip>
 #include <map>
 
-// Custom function
+// Custom functions
+#include "control_unit.h"
 #include "decode.h"
 #include "fetch.h"
 #include "execute.h"
@@ -34,16 +35,18 @@ int main()
     cout << endl;
 
     // DECODE
-    int readData1, readData2, alu_op;
+    int readData1, readData2;
     string destReg;
     bool memtoReg, memWrite;
-    tie(destReg, readData1, readData2, alu_op, memtoReg, memWrite) = decode(instruction);
+    tie(destReg, readData1, readData2, memtoReg, memWrite) = decode(instruction);
 
     // CONTROL UNIT
-    // int alu_op = controlunit(?);
+    int opcode = binaryToDecimal(instruction.substr(0, 6));
+    int funct = binaryToDecimal(instruction.substr(26, 6));
+    int ALUControl_result = controlUnit(opcode, funct);;
 
     // EXECUTE
-    int alu_result = execute(readData1, readData2, alu_op);
+    int alu_result = execute(readData1, readData2, ALUControl_result);
 
     // No WRITEBACK
     if(destReg == "none") {

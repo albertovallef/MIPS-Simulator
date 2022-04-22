@@ -18,18 +18,19 @@ int execute(int readData1, int readData2, int alu_op) {
     case 2:
         // 0010 do add
         return (readData1 + readData2);
-    case 5:
+    case 6:
+        // 0110 substract
         if(readData1 - readData2 == 0) {
             alu_zero = true;
         }
         return (readData1 - readData2);
-    case 6:
+    case 7:
         // 0111 do set-on-less-than
         if (readData1 < readData2){
             return 1;
         }
         return 0;
-    case 12:
+    case 0xc:
         // 1100 do NOR
         return (~(readData1 | readData2));
     default:
