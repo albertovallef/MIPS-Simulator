@@ -3,23 +3,22 @@
 
 using namespace std;
 
-
-int RegWrite = 0, RegDst = 0, Branch = 0, ALUSrc = 0, InstType = 0, 
-MemWrite = 0, MemtoReg = 0, MemRead = 0, Jump = 0, ALUop = 0;
+bool RegWrite = false, RegDst = false, Branch = false, ALUSrc = false, InstType = false, 
+MemWrite = false, MemtoReg = false, MemRead = false, Jump = false;
 
 int ALUControl(int ALUop, int funct);
 void resetConstrolUnitSignals();
 
 void resetConstrolUnitSignals() {
-    RegWrite = 0;
-    RegDst = 0;
-    Branch = 0;
-    ALUSrc = 0;
-    InstType = 0; 
-    MemWrite = 0;
-    MemtoReg = 0;
-    MemRead = 0;
-    Jump = 0;
+    RegWrite = false;
+    RegDst = false;
+    Branch = false;
+    ALUSrc = false;
+    InstType = false; 
+    MemWrite = false;
+    MemtoReg = false;
+    MemRead = false;
+    Jump = false;
 }
 
 int controlUnit(int opcode, int funct) {
@@ -27,25 +26,24 @@ int controlUnit(int opcode, int funct) {
     switch(opcode) {
         case 0x0:
         // R-Format
-            RegDst = 1;
-            RegWrite = 1;
+            RegDst = true;
+            RegWrite = true;
             return ALUControl(2, funct);
         case 0x23:
         // lw operation
-            ALUSrc = 1;
-            MemtoReg = 1;
-            RegWrite = 1;
-            MemRead = 1;
+            ALUSrc = true;
+            MemtoReg = true;
+            RegWrite = true;
+            MemRead = true;
             return ALUControl(0, funct);
         case 0x2b:
         // sw operation
-            ALUSrc = 1;
-            MemWrite = 1;
-            ALUop = 0;
+            ALUSrc = true;
+            MemWrite = true;
             return ALUControl(0, funct);
         case 0x4:
         // beq operation
-            Branch = 1;
+            Branch = true;
             return ALUControl(1, funct);
         default:
         // Error
