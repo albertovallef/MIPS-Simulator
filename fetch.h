@@ -19,7 +19,7 @@ std::string fetch(std::string textFile) {
         int i = 0;
         if(alu_zero) {
             pc = pc + jump_next;
-            writeback("none", 0, false, false); 
+            writeback("none", 0); 
         }
         // Iterate over the lines in the file
         while ( InstructionFile.good() )

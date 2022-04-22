@@ -37,8 +37,7 @@ int main()
     // DECODE
     int readData1, readData2;
     string destReg;
-    bool memtoReg, memWrite;
-    tie(destReg, readData1, readData2, memtoReg, memWrite) = decode(instruction);
+    tie(destReg, readData1, readData2) = decode(instruction);
 
     // CONTROL UNIT
     int opcode = binaryToDecimal(instruction.substr(0, 6));
@@ -52,7 +51,7 @@ int main()
     if(destReg == "none") {
         continue;
     }
-    writeback(destReg, alu_result, memtoReg, memWrite);
+    writeback(destReg, alu_result);
 
     }
 }
