@@ -1,10 +1,8 @@
 #ifndef FETCH_H
 #define FETCH_H
 
-
-// Global variables
-int pc = 0;
-int next_pc =  pc + 4;
+extern int pc;
+extern int next_pc;
 
 #include "execute.h"
 #include "writeback.h"
@@ -20,6 +18,14 @@ std::string fetch(std::string textFile) {
         if(alu_zero) {
             pc = pc + jump_next;
             writeback("none", 0); 
+        }
+        else if(Jump){
+            if(jump_jal != NULL) {
+               pc = jump_jal;
+            } else {
+               pc = registerfile["$ra"];
+            }
+            Jump = false;
         }
         // Iterate over the lines in the file
         while ( InstructionFile.good() )

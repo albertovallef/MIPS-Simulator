@@ -45,6 +45,14 @@ int controlUnit(int opcode, int funct) {
         // beq operation
             Branch = true;
             return ALUControl(1, funct);
+        case 0x3:
+        // jal operation
+            Jump = true;
+            return ALUControl(0, funct);
+         case 0x08:
+        // jr operation
+            Jump = true;
+            return ALUControl(0, funct);
         default:
         // Error
             return 10000;
