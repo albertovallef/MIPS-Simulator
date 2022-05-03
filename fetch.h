@@ -20,7 +20,7 @@ std::string fetch(std::string textFile) {
             writeback("none", 0); 
         }
         else if(Jump){
-            if(jump_jal != NULL) {
+            if(jump_jal != 0) {
                pc = jump_jal;
             } else {
                pc = registerfile["$ra"];
