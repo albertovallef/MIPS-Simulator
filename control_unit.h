@@ -85,6 +85,10 @@ int ALUControl(int ALUop, int funct) {
             // 0001 OR
             return 1;
         }
+        else if(funct == 0x27){
+            // NOR
+            return 0xc;
+        }
         else {
             // 0111 set on less than
             return 7;
