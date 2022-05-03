@@ -98,44 +98,18 @@ tuple<string, int, int> decodeRtypeInstruction(string instruction){
         {"23", "subu",}
         };
     // TODO: Need to clean this up
-    if(operationTable[FUNCT(instruction)] == "sub"){
-        int readData1 = registerfile[RS(instruction)];
-        int readData2 = registerfile[RT(instruction)];
-        string destReg = RD(instruction);
-        return make_tuple(destReg, readData1, readData2); 
-    }
-    else if (operationTable[FUNCT(instruction)] == "slt"){
-        int readData1 = registerfile[RS(instruction)];
-        int readData2 = registerfile[RT(instruction)];
-        string destReg = RD(instruction);
-        return make_tuple(destReg, readData1, readData2);
-    }
-    else if (operationTable[FUNCT(instruction)] == "and"){
-        int readData1 = registerfile[RS(instruction)];
-        int readData2 = registerfile[RT(instruction)];
-        string destReg = RD(instruction);
-        return make_tuple(destReg, readData1, readData2);
-    }
-    else if (operationTable[FUNCT(instruction)] == "or"){
-        int readData1 = registerfile[RS(instruction)];
-        int readData2 = registerfile[RT(instruction)];
-        string destReg = RD(instruction);
-        return make_tuple(destReg, readData1, readData2);
-    }
-    else if (operationTable[FUNCT(instruction)] == "nor"){
-        int readData1 = registerfile[RS(instruction)];
-        int readData2 = registerfile[RT(instruction)];
-        string destReg = RD(instruction);
-        return make_tuple(destReg, readData1, readData2);
-    }
-    else if(operationTable[FUNCT(instruction)] == "jr"){
-        int readData1 = registerfile["$ra"];
+    if(operationTable[FUNCT(instruction)] == "jr"){
+        int readData1 = 0;
         int readData2 = 0;
         string destReg = "None";
         return make_tuple(destReg, readData1, readData2);
+    } 
+    else {
+        int readData1 = registerfile[RS(instruction)];
+        int readData2 = registerfile[RT(instruction)];
+        string destReg = RD(instruction);
+        return make_tuple(destReg, readData1, readData2);
     }
-    string destReg = RT(instruction);
-    return make_tuple(destReg, 1, 1);
 }
 
 tuple<string, int, int> decodeItypeInstruction(string instruction){
@@ -197,7 +171,7 @@ tuple<string, int, int> decodeJtypeInstruction(string instruction){
     else if (operationTable[OPCODE(instruction)] == "jal") {
         registerfile["$ra"] = next_pc;
         pc = ADDRESS(instruction);
-        string destReg = "none";
+        string destReg = "$ra";
         return make_tuple(destReg, 0, 0); 
     }
     string destReg = RT(instruction);
