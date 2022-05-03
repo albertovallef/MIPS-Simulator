@@ -49,8 +49,6 @@ int main()
     int ALUControl_result = controlUnit(opcode, funct);
 
     if(Jump) {
-        cout << "JUMP " << endl;
-        cout << pc << endl;
         continue;
     }
 
