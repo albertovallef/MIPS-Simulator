@@ -25,7 +25,7 @@ void writeback(string destReg, int alu_result){
         }
     }
     else {
-        if(Jump) {
+        if(Jump && destReg != "none") {
             registerfile["$ra"] = alu_result;
             cout << destReg + " is modified to 0x" << std::hex << registerfile[destReg] << endl;
         }

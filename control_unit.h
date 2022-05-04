@@ -26,8 +26,14 @@ int controlUnit(int opcode, int funct) {
     switch(opcode) {
         case 0x0:
         // R-Format
-            RegDst = true;
-            RegWrite = true;
+            // jr operation
+            if(funct == 0x8){
+                Jump = true;
+            }
+            else {
+              RegDst = true;
+              RegWrite = true;  
+            }
             return ALUControl(2, funct);
         case 0x23:
         // lw operation
@@ -49,8 +55,8 @@ int controlUnit(int opcode, int funct) {
         // jal operation
             Jump = true;
             return ALUControl(0, funct);
-         case 0x08:
-        // jr operation
+        case 0x2:
+        // j operation
             Jump = true;
             return ALUControl(0, funct);
         default:

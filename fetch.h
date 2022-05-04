@@ -19,14 +19,22 @@ std::string fetch(std::string textFile) {
             pc = pc + jump_next;
             writeback("none", 0); 
         }
-        else if(Jump){
-            if(jump_jal != 0) {
-               pc = jump_jal;
-            } else {
-               pc = registerfile["$ra"];
-            }
-            Jump = false;
+        else if(jump_jr) {
+            pc = registerfile["$ra"];
+            jump_jr = false;
+            writeback("none", 0);
         }
+        else if(jump_target != 0) {
+            pc = jump_target;
+            jump_target = 0;
+            writeback("none", 0);
+        }
+        // else if(jump_target != 0) {
+        //     pc = jump_target;
+        //     cout << pc << endl;
+        //     jump_target = 0;
+        //     exit(3);
+        // }
         // Iterate over the lines in the file
         while ( InstructionFile.good() )
         {

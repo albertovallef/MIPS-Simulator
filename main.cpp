@@ -48,10 +48,6 @@ int main()
     int funct = binaryToDecimal(instruction.substr(26, 6));
     int ALUControl_result = controlUnit(opcode, funct);
 
-    // if(Jump) {
-    //     continue;
-    // }
-
     // EXECUTE
     int alu_result = execute(readData1, readData2, ALUControl_result);
 

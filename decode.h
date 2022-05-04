@@ -22,7 +22,8 @@ string getRegisterName(int registerNumber);
 int binaryToDecimal(string binary);
 int sign_extend(int binary, int bits);
 int jump_next = 0;
-int jump_jal = 0;
+int jump_target = 0;
+bool jump_jr = false;
 tuple<string, int, int> decodeRtypeInstruction(string instruction);
 tuple<string, int, int> decodeItypeInstruction(string instruction);
 tuple<string, int, int> decodeJtypeInstruction(string instruction);
@@ -98,7 +99,8 @@ tuple<string, int, int> decodeRtypeInstruction(string instruction){
     if(operationTable[FUNCT(instruction)] == "jr"){
         int readData1 = 0;
         int readData2 = 0;
-        string destReg = "None";
+        string destReg = "none";
+        jump_jr = true;
         return make_tuple(destReg, readData1, readData2);
     } 
     else {
@@ -161,7 +163,7 @@ tuple<string, int, int> decodeJtypeInstruction(string instruction){
         };
 
     if(operationTable[OPCODE(instruction)] == "j"){
-        //jump_next = jump_next << 4;
+        jump_target = (ADDRESS(instruction))<<2;
         string destReg = "none";
         return make_tuple(destReg, 0, 0); 
     }
