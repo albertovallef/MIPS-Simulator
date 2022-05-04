@@ -51,10 +51,7 @@ tuple<string, int, int> decode(string instruction)
         return decodeItypeInstruction(instruction);
     }
     else {
-        decodeJtypeInstruction(instruction);
-        // FAKE data, need to implement this
-        string ran = "ads";
-        return make_tuple(ran, 2, 3);
+        return decodeJtypeInstruction(instruction);
     }
 }
 
@@ -169,10 +166,10 @@ tuple<string, int, int> decodeJtypeInstruction(string instruction){
         return make_tuple(destReg, 0, 0); 
     }
     else if (operationTable[OPCODE(instruction)] == "jal") {
-        registerfile["$ra"] = next_pc;
-        pc = ADDRESS(instruction);
+        int raAddress= pc;
+        pc = (ADDRESS(instruction))<<2;
         string destReg = "$ra";
-        return make_tuple(destReg, 0, 0); 
+        return make_tuple(destReg, raAddress, 0); 
     }
     string destReg = RT(instruction);
     return make_tuple(destReg, 1, 1);

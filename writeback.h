@@ -24,6 +24,12 @@ void writeback(string destReg, int alu_result){
             cout << destReg + " is modified to 0x" << std::hex << registerfile[destReg] << endl;
         }
     }
+    else {
+        if(Jump) {
+            registerfile["$ra"] = alu_result;
+            cout << destReg + " is modified to 0x" << std::hex << registerfile[destReg] << endl;
+        }
+    }
     cout << "pc is modified to 0x" << std::hex << pc << endl;  
 }
 
