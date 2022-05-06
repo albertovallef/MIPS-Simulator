@@ -3,6 +3,7 @@
 
 using namespace std;
 
+// MACROS do some string manipulation to get the desired bits
 #define OPCODE(instruction) (decimalToHexa(binaryToDecimal(instruction.substr(0, 6))))
 #define RS(instruction) (getRegisterName(binaryToDecimal(instruction.substr(6, 5))))
 #define RT(instruction) (getRegisterName(binaryToDecimal(instruction.substr(11, 5))))
@@ -15,6 +16,7 @@ using namespace std;
 extern int pc;
 extern int next_pc;
 
+// Define all the function implemented here
 template<typename T>
 string decimalToHexa(T value);
 string getInstructionType(string opcode);
@@ -27,13 +29,15 @@ bool jump_jr = false;
 tuple<string, int, int> decodeRtypeInstruction(string instruction);
 tuple<string, int, int> decodeItypeInstruction(string instruction);
 tuple<string, int, int> decodeJtypeInstruction(string instruction);
+
+// Global register file that is modified after the writeback
 map<string, int> registerfile = {
         {"$zero", 0,}, // $zero
         {"$at", 0,}, // $at
         {"$v0", 0,}, {"$v1", 0,}, // $v0-$v1
-        {"$a0", 0x5,},{"$a1", 0x2,},{"$a2", 0,},{"$a3", 0xa,}, // $a0-$a3
-        {"$t0", 0,},{"$t1", 0,},{"$t2", 0,},{"$t3", 0,},{"$t4", 0,},{"$t5", 0,},{"$t6", 0,},{"$t7", 0,}, // $t0-$t7
-        {"$s0", 0x20,},{"$s1", 0,},{"$s2", 0,},{"$s3", 0,},{"$s4", 0,},{"$s5", 0,},{"$s6", 0,},{"$s7", 0,}, // $s0-$s7
+        {"$a0", 0,},{"$a1", 0,},{"$a2", 0,},{"$a3", 0,}, // $a0-$a3
+        {"$t0", 0,},{"$t1", 0x20,},{"$t2", 0x5,},{"$t3", 0,},{"$t4", 0,},{"$t5", 0,},{"$t6", 0,},{"$t7", 0,}, // $t0-$t7
+        {"$s0", 0x70,},{"$s1", 0,},{"$s2", 0,},{"$s3", 0,},{"$s4", 0,},{"$s5", 0,},{"$s6", 0,},{"$s7", 0,}, // $s0-$s7
         {"$t8", 0,},{"$t9", 0,}, // $t8-$t9
         {"$k0", 0,},{"$k1", 0,}, // $k0-$k1
         {"$gp", 0,}, // $gp
@@ -44,7 +48,10 @@ map<string, int> registerfile = {
 
 tuple<string, int, int> decode(string instruction)
 {
+    // Check first for the instruction type
     string instructionType = getInstructionType(OPCODE(instruction));
+
+    // Decode the string binary instruction
     if(instructionType == "R"){
         return decodeRtypeInstruction(instruction);
     }
@@ -56,11 +63,13 @@ tuple<string, int, int> decode(string instruction)
     }
 }
 
+// Helper function to convert from binary to decimal
 int binaryToDecimal(string binary) {
 	int decimalNumber = stoi(binary, 0, 2);
     return decimalNumber;
 }
 
+// Helper function to convert from decimal to string hex (not really needed)
 template<typename T >
 string decimalToHexa( T value){
     std::stringstream stream;
@@ -68,6 +77,7 @@ string decimalToHexa( T value){
     return stream.str();
 }
 
+// Function used to the the type of instruction 
 string getInstructionType(string opcode){
     if(opcode == "0"){
         return "R";
@@ -95,15 +105,19 @@ tuple<string, int, int> decodeRtypeInstruction(string instruction){
         {"22", "sub",},
         {"23", "subu",}
         };
-    // TODO: Need to clean this up
+    
+    // Decode JR 
     if(operationTable[FUNCT(instruction)] == "jr"){
+        // Update the readData to 0 since there is no data to update
         int readData1 = 0;
         int readData2 = 0;
+        // No register this will help us to jump fetch in main
         string destReg = "none";
         jump_jr = true;
         return make_tuple(destReg, readData1, readData2);
     } 
     else {
+        // The remaining of the instructions follow the same approach
         int readData1 = registerfile[RS(instruction)];
         int readData2 = registerfile[RT(instruction)];
         string destReg = RD(instruction);
@@ -130,30 +144,22 @@ tuple<string, int, int> decodeItypeInstruction(string instruction){
         {"29", "sh",},
         {"2b", "sw",}
         };
-
-    if(operationTable[OPCODE(instruction)] == "lw"){
-        int readData1 = registerfile[RS(instruction)];
-        int readData2 = sign_extend(IMMEDIATE(instruction), 32);
-        string destReg = RT(instruction);
-        return make_tuple(destReg, readData1, readData2); 
-    }
-    else if (operationTable[OPCODE(instruction)] == "beq") {
+    // Edge case when with BEQ
+    if (operationTable[OPCODE(instruction)] == "beq") {
         int readData1 = registerfile[RS(instruction)];
         int readData2 = registerfile[RT(instruction)];
         jump_next = sign_extend(IMMEDIATE(instruction), 32);
-        jump_next = jump_next << 2;
-        string destReg = "none";
+        jump_next = jump_next << 2; // Update jump_next with the address where we need to jump 
+        string destReg = "none"; // No need to write back - This will redirect to fetch to jump_next instruction
         return make_tuple(destReg, readData1, readData2); 
     }
-    else if (operationTable[OPCODE(instruction)] == "sw") {
+    // SW and LW follow the same approach
+    else {
         int readData1 = registerfile[RS(instruction)];
         int readData2 = sign_extend(IMMEDIATE(instruction), 32);
         string destReg = RT(instruction);
         return make_tuple(destReg, readData1, readData2); 
     }
-    string destReg = RT(instruction);
-    return make_tuple(destReg, 1, 1);
-
 }
 
 tuple<string, int, int> decodeJtypeInstruction(string instruction){
@@ -162,27 +168,28 @@ tuple<string, int, int> decodeJtypeInstruction(string instruction){
         {"3", "jal",}
         };
 
-    if(operationTable[OPCODE(instruction)] == "j"){
-        jump_target = (ADDRESS(instruction))<<2;
-        string destReg = "none";
+    if(operationTable[OPCODE(instruction)] == "j") {
+        jump_target = (ADDRESS(instruction))<<2; // Prepare the jump_target address
+        string destReg = "none"; // No need to write back - Go to fetch
         return make_tuple(destReg, 0, 0); 
     }
-    else if (operationTable[OPCODE(instruction)] == "jal") {
-        int raAddress= pc;
+    // JAL instruction
+    else {
+        int raAddress= pc; // This is the address where we need to return when JR
         pc = (ADDRESS(instruction))<<2;
-        string destReg = "$ra";
+        string destReg = "$ra"; // Update the register with the pc + 4
         return make_tuple(destReg, raAddress, 0); 
     }
-    string destReg = RT(instruction);
-    return make_tuple(destReg, 1, 1);
 }
 
+// Helper function to sign extend the interger value
 int sign_extend(int binary, int bits) {
     int m = 1;
     m <<= bits - 1;
     return (binary ^ m) - m;
 }
 
+// Helper function to return the name of the register
 string getRegisterName(int regNumber){
     switch(regNumber) {
     case 0: return "$zero";

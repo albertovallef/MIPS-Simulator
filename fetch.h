@@ -15,27 +15,28 @@ std::string fetch(std::string textFile) {
     if (InstructionFile.is_open())
     {
         int i = 0;
+        // Case when BEQ is taken 
         if(alu_zero) {
             pc = pc + jump_next;
+            // Print but do not update register file or mem
             writeback("none", 0); 
         }
+        // Case when JR isntruction
         else if(jump_jr) {
-            pc = registerfile["$ra"];
+            pc = registerfile["$ra"]; // pc uses the value in $ra (from JAL)
             jump_jr = false;
+            // Print but do not update register file or mem
             writeback("none", 0);
         }
+        // Case when J instruction
         else if(jump_target != 0) {
-            pc = jump_target;
+            pc = jump_target; // pc uses the value in the address (from binary instruction)
             jump_target = 0;
+            // Print but do not update register file or mem
             writeback("none", 0);
         }
-        // else if(jump_target != 0) {
-        //     pc = jump_target;
-        //     cout << pc << endl;
-        //     jump_target = 0;
-        //     exit(3);
-        // }
-        // Iterate over the lines in the file
+
+        // Iterate over the lines in the file (Normal case or cycle)
         while ( InstructionFile.good() )
         {
             // Get the current PC instruction
@@ -44,6 +45,7 @@ std::string fetch(std::string textFile) {
                 pc += 4;
                 return instruction;
             }
+            // Divide over 4 to get the current integer instruction
             else if(pc/4 == i){
                 pc += 4;
                 return instruction;

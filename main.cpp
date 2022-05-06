@@ -22,7 +22,7 @@ using namespace std;
 int main()
 {
     // Get the name of the text file with instructions
-    string textFile = "sample_part2.txt";
+    string textFile = "sample_part1.txt";
     // cin >> textFile;
 
     while(true){
@@ -51,10 +51,12 @@ int main()
     // EXECUTE
     int alu_result = execute(readData1, readData2, ALUControl_result);
 
-    // No WRITEBACK
+    // No WRITEBACK (J, JR, BEQ)
     if(destReg == "none") {
         continue;
     }
+
+    // WRITEBACK
     writeback(destReg, alu_result);
 
     }
